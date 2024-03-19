@@ -1,5 +1,8 @@
 #!/bin/bash
 docker-compose pull
+openssl rand -base64 756 > ./mongodb.key
+chmod 600 ./mongodb.key
+chown 999:root ./mongodb.key
 docker-compose up -d
 
 echo "Docker Compose 重新拉取镜像完成！"
