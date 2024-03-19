@@ -50,7 +50,8 @@ const Login = () => {
       [LoginPageTypeEnum.wechat]: WechatForm
     };
 
-    const Component = TypeMap[type];
+    // const Component = TypeMap[type];
+    const Component = LoginForm;
 
     return <Component setPageType={setPageType} loginSuccess={loginSuccess} />;
   }
