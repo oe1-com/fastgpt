@@ -38,7 +38,7 @@ services:
       - -c
       - |
         openssl rand -base64 128 > /data/mongodb.key
-        chmod 400 /data/mongodb.key
+        chmod 600 /data/mongodb.key
         exec docker-entrypoint.sh $$@
 networks:
   fastgpt:
