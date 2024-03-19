@@ -33,12 +33,5 @@ services:
     volumes:
       - ./mongo/data:/data/db
       - ./mongodb.key:/data/mongodb.key
-    entrypoint:
-      - bash
-      - -c
-      - |
-        openssl rand -base64 756 > /data/mongodb.key
-        chmod 600 /data/mongodb.key
-        chown 999:root /data/mongodb.key
 networks:
   fastgpt:
