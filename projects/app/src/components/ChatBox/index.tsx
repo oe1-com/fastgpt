@@ -53,7 +53,6 @@ import type { AdminMarkType } from './SelectMarkCollection';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import Avatar from '@/components/Avatar';
 import Markdown, { CodeClassName } from '@/components/Markdown';
-import MySelect from '@/components/Select';
 import MyTooltip from '../MyTooltip';
 import dynamic from 'next/dynamic';
 const ResponseTags = dynamic(() => import('./ResponseTags'));
@@ -69,6 +68,7 @@ import MessageInput from './MessageInput';
 import { ModuleOutputKeyEnum } from '@fastgpt/global/core/module/constants';
 import ChatBoxDivider from '../core/chat/Divider';
 import { OutLinkChatAuthProps } from '@fastgpt/global/support/permission/chat';
+import MySelect from '@fastgpt/web/components/common/MySelect';
 
 const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz1234567890', 24);
 
@@ -186,6 +186,10 @@ const ChatBox = (
     () => splitGuideModule(userGuideModule),
     [userGuideModule]
   );
+  const filterVariableModules = useMemo(
+    () => variableModules.filter((item) => item.type !== VariableInputEnum.external),
+    [variableModules]
+  );
 
   // compute variable input is finish.
   const chatForm = useForm<{
@@ -200,17 +204,18 @@ const ChatBox = (
 
   const [variableInputFinish, setVariableInputFinish] = useState(false); // clicked start chat button
   const variableIsFinish = useMemo(() => {
-    if (!variableModules || variableModules.length === 0 || chatHistory.length > 0) return true;
+    if (!filterVariableModules || filterVariableModules.length === 0 || chatHistory.length > 0)
+      return true;
 
-    for (let i = 0; i < variableModules.length; i++) {
-      const item = variableModules[i];
+    for (let i = 0; i < filterVariableModules.length; i++) {
+      const item = filterVariableModules[i];
       if (item.required && !variables[item.key]) {
         return false;
       }
     }
 
     return variableInputFinish;
-  }, [chatHistory.length, variableInputFinish, variableModules, variables]);
+  }, [chatHistory.length, variableInputFinish, filterVariableModules, variables]);
 
   // 滚动到底部
   const scrollToBottom = (behavior: 'smooth' | 'auto' = 'smooth') => {
@@ -495,7 +500,7 @@ const ChatBox = (
     getChatHistories: () => chatHistory,
     resetVariables(e) {
       const defaultVal: Record<string, any> = {};
-      variableModules?.forEach((item) => {
+      filterVariableModules?.forEach((item) => {
         defaultVal[item.key] = '';
       });
 
@@ -519,13 +524,13 @@ const ChatBox = (
       feConfigs?.show_emptyChat &&
       showEmptyIntro &&
       chatHistory.length === 0 &&
-      !variableModules?.length &&
+      !filterVariableModules?.length &&
       !welcomeText,
     [
       chatHistory.length,
       feConfigs?.show_emptyChat,
       showEmptyIntro,
-      variableModules?.length,
+      filterVariableModules?.length,
       welcomeText
     ]
   );
@@ -604,10 +609,10 @@ const ChatBox = (
           {showEmpty && <Empty />}
           {!!welcomeText && <WelcomeText appAvatar={appAvatar} welcomeText={welcomeText} />}
           {/* variable input */}
-          {!!variableModules?.length && (
+          {!!filterVariableModules?.length && (
             <VariableInput
               appAvatar={appAvatar}
-              variableModules={variableModules}
+              variableModules={filterVariableModules}
               variableIsFinish={variableIsFinish}
               chatForm={chatForm}
               onSubmitVariables={onSubmitVariables}

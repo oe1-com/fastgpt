@@ -30,24 +30,29 @@ import { MongoOutLink } from '@fastgpt/service/support/outLink/schema';
 import { OutLinkWithAppType } from '@fastgpt/global/support/outLink/type';
 
 const OutLink = ({
-  shareId,
-  chatId,
-  showHistory,
-  authToken,
   appName,
   appIntro,
   appAvatar
 }: {
-  shareId: string;
-  chatId: string;
-  showHistory: '0' | '1';
-  authToken?: string;
   appName?: string;
   appIntro?: string;
   appAvatar?: string;
 }) => {
   const { t } = useTranslation();
   const router = useRouter();
+  const {
+    shareId = '',
+    chatId = '',
+    showHistory = '1',
+    authToken,
+    ...customVariables
+  } = router.query as {
+    shareId: string;
+    chatId: string;
+    showHistory: '0' | '1';
+    authToken: string;
+    [key: string]: string;
+  };
   const { toast } = useToast();
   const { isOpen: isOpenSlider, onClose: onCloseSlider, onOpen: onOpenSlider } = useDisclosure();
   const { isPc } = useSystemStore();
@@ -56,11 +61,7 @@ const OutLink = ({
   const initSign = useRef(false);
   const [isEmbed, setIdEmbed] = useState(true);
 
-  const {
-    localUId,
-    shareChatHistory, // abandon
-    clearLocalHistory // abandon
-  } = useShareChatStore();
+  const { localUId } = useShareChatStore();
   const {
     histories,
     loadHistories,
@@ -83,7 +84,10 @@ const OutLink = ({
       const { responseText, responseData } = await streamFetch({
         data: {
           messages: prompts,
-          variables,
+          variables: {
+            ...customVariables,
+            ...variables
+          },
           shareId,
           chatId: completionChatId,
           outLinkUid
@@ -159,6 +163,7 @@ const OutLink = ({
     },
     [
       chatId,
+      customVariables,
       shareId,
       outLinkUid,
       t,
@@ -293,6 +298,7 @@ const OutLink = ({
               <ChatHistorySlider
                 appName={chatData.app.name}
                 appAvatar={chatData.app.avatar}
+                confirmClearText={t('core.chat.Confirm to clear share chat history')}
                 activeChatId={chatId}
                 history={histories.map((item) => ({
                   id: item.chatId,
@@ -391,9 +397,6 @@ const OutLink = ({
 
 export async function getServerSideProps(context: any) {
   const shareId = context?.query?.shareId || '';
-  const chatId = context?.query?.chatId || '';
-  const showHistory = context?.query?.showHistory || '1';
-  const authToken = context?.query?.authToken || '';
 
   const app = await (async () => {
     try {
@@ -413,13 +416,9 @@ export async function getServerSideProps(context: any) {
 
   return {
     props: {
-      shareId,
-      chatId,
-      showHistory,
-      authToken,
-      appName: app?.appId?.name,
-      appAvatar: app?.appId?.avatar,
-      appIntro: app?.appId?.intro,
+      appName: app?.appId?.name || '',
+      appAvatar: app?.appId?.avatar || '',
+      appIntro: app?.appId?.intro || '',
       ...(await serviceSideProps(context))
     }
   };

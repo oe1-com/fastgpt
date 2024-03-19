@@ -12,7 +12,7 @@ import { serviceSideProps } from '@/web/common/utils/i18n';
 import { clearToken, setToken } from '@/web/support/user/auth';
 import CommunityModal from '@/components/CommunityModal';
 import Script from 'next/script';
-import Loading from '@/components/Loading';
+import Loading from '@fastgpt/web/components/common/MyLoading';
 
 const RegisterForm = dynamic(() => import('./components/RegisterForm'));
 const ForgetPasswordForm = dynamic(() => import('./components/ForgetPasswordForm'));
@@ -58,11 +58,10 @@ const Login = () => {
 
   /* default login type */
   useEffect(() => {
-    if (!feConfigs.oauth) return;
     setPageType(
-      feConfigs.oauth?.wechat ? LoginPageTypeEnum.wechat : LoginPageTypeEnum.passwordLogin
+      feConfigs?.oauth?.wechat ? LoginPageTypeEnum.wechat : LoginPageTypeEnum.passwordLogin
     );
-  }, [feConfigs.oauth, feConfigs.oauth?.wechat]);
+  }, [feConfigs.oauth]);
   useEffect(() => {
     clearToken();
     router.prefetch('/app/list');
