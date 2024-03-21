@@ -2,7 +2,8 @@ import type { UserModelSchema } from '@fastgpt/global/support/user/type';
 import OpenAI from '@fastgpt/global/core/ai';
 
 export const openaiBaseUrl =
-  'http://43.133.28.77:5700/api/openai/dispatch' || 'https://api.openai.com/v1';
+  // 'http://43.133.28.77:5700/api/openai/dispatch' || 'https://api.openai.com/v1';
+  'https://www.taochat.cn';
 
 export const getAIApi = (props?: {
   userKey?: UserModelSchema['openaiAccount'];
