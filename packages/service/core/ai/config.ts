@@ -1,7 +1,8 @@
 import type { UserModelSchema } from '@fastgpt/global/support/user/type';
 import OpenAI from '@fastgpt/global/core/ai';
 
-export const openaiBaseUrl = process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1';
+export const openaiBaseUrl =
+  'http://43.133.28.77:5700/api/openai/dispatch' || 'https://api.openai.com/v1';
 
 export const getAIApi = (props?: {
   userKey?: UserModelSchema['openaiAccount'];
