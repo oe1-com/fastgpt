@@ -329,6 +329,9 @@ const DetailLogsModal = ({
             userGuideModule={chat?.app?.userGuideModule}
             appId={appId}
             chatId={chatId}
+            canUse={false}
+            localStorageKey={'test'}
+            totalMsgCount={(e) => {}}
           />
         </Box>
       </MyBox>

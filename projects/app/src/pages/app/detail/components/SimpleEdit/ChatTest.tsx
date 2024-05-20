@@ -105,6 +105,9 @@ const ChatTest = ({ appId }: { appId: string }) => {
           showFileSelector={checkChatSupportSelectFileByModules(modules)}
           onStartChat={startChat}
           onDelMessage={() => {}}
+          canUse={false}
+          localStorageKey={'test'}
+          totalMsgCount={(e) => {}}
         />
       </Box>
       {appDetail.type !== AppTypeEnum.simple && (

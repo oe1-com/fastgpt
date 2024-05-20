@@ -373,6 +373,9 @@ const OutLink = ({
                 chatId={chatId}
                 teamId={teamId}
                 teamToken={teamToken}
+                canUse={false}
+                localStorageKey={'test'}
+                totalMsgCount={(e) => {}}
               />
             </Box>
           </Flex>

@@ -356,6 +356,9 @@ const Chat = ({ appId, chatId }: { appId: string; chatId: string }) => {
                 onDelMessage={(e) => delOneHistoryItem({ ...e, appId, chatId })}
                 appId={appId}
                 chatId={chatId}
+                canUse={false}
+                localStorageKey={'test'}
+                totalMsgCount={(e) => {}}
               />
             </Box>
           </Flex>
