@@ -13,18 +13,19 @@ const ToolMenu = ({ history }: { history: ChatItemType[] }) => {
 
   const menuList = useMemo(
     () => [
-      {
-        icon: 'core/chat/chatLight',
-        label: t('core.chat.New Chat'),
-        onClick: () => {
-          router.replace({
-            query: {
-              ...router.query,
-              chatId: ''
-            }
-          });
-        }
-      },
+      // 目前注释掉新对话的功能
+      // {
+      //   icon: 'core/chat/chatLight',
+      //   label: t('core.chat.New Chat'),
+      //   onClick: () => {
+      //     router.replace({
+      //       query: {
+      //         ...router.query,
+      //         chatId: ''
+      //       }
+      //     });
+      //   }
+      // },
       {
         icon: 'core/app/appApiLight',
         label: `HTML ${t('Export')}`,

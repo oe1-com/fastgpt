@@ -129,6 +129,9 @@ type Props = OutLinkChatAuthProps & {
     isNewChat?: boolean;
   }>;
   onDelMessage?: (e: { contentId?: string; index: number }) => void;
+  canUse: boolean;
+  localStorageKey: string;
+  totalMsgCount: (e: number) => void;
 };
 
 const ChatBox = (
@@ -150,7 +153,10 @@ const ChatBox = (
     teamToken,
     onUpdateVariable,
     onStartChat,
-    onDelMessage
+    onDelMessage,
+    canUse,
+    localStorageKey,
+    totalMsgCount
   }: Props,
   ref: ForwardedRef<ComponentRef>
 ) => {
@@ -174,6 +180,8 @@ const ChatBox = (
   }>();
   const [adminMarkData, setAdminMarkData] = useState<AdminMarkType & { chatItemId: string }>();
   const [questionGuides, setQuestionGuide] = useState<string[]>([]);
+  const [totalOver, setTotalOver] = useState(false);
+  const [totalNum, setTotalNum] = useState(0);
 
   const isChatting = useMemo(
     () =>
@@ -356,6 +364,12 @@ const ChatBox = (
             value: '',
             status: 'loading'
           }
+          // {
+          //   dataId: nanoid(),
+          //   obj: 'AI',
+          //   value: 'I\'m a AI',
+          //   status: 'finish'
+          // }
         ];
 
         // 插入内容
@@ -397,6 +411,17 @@ const ChatBox = (
           // set finish status
           setChatHistory((state) =>
             state.map((item, index) => {
+              if (localStorage) {
+                const nowStorage = JSON.parse(localStorage.getItem(localStorageKey) || '');
+                const testArr = [];
+                if (nowStorage) {
+                  if (!nowStorage.useHistory.find((it: any) => it.dataId === item.dataId)) {
+                    testArr.push(item);
+                  }
+                  nowStorage.useHistory = nowStorage.useHistory.concat(testArr);
+                }
+                localStorage.setItem(localStorageKey, JSON.stringify(nowStorage));
+              }
               if (index !== state.length - 1) return item;
               return {
                 ...item,
@@ -405,7 +430,34 @@ const ChatBox = (
               };
             })
           );
+
           setTimeout(() => {
+            if (localStorage) {
+              const localData = JSON.parse(localStorage.getItem(localStorageKey) || '');
+              const nowChatDataIds = newChatList.map((it) => it.dataId);
+              const newArr = localData.useHistory.filter(
+                (it: any) => !nowChatDataIds.includes(it.dataId)
+              );
+              const userPromptArr = newArr
+                .concat(newChatList)
+                .filter((it: any) => it.obj === 'Human');
+              totalMsgCount(userPromptArr.filter((it: any) => it.obj === 'Human').length);
+              setTotalNum(userPromptArr.filter((it: any) => it.obj === 'Human').length);
+              if (userPromptArr.length >= 5) {
+                // ! 如果条数超过限制，需要提示
+                setTotalOver(true);
+                setChatHistory((state) =>
+                  state.concat({
+                    dataId: nanoid(),
+                    obj: 'AI',
+                    value: '您好，您的提问机会已用尽！',
+                    status: 'finish'
+                  })
+                );
+              }
+            } else {
+              setTotalOver(true);
+            }
             createQuestionGuide({
               history: newChatList.map((item, i) =>
                 i === newChatList.length - 1
@@ -599,6 +651,24 @@ const ChatBox = (
     },
     [onUpdateVariable]
   );
+
+  useEffect(() => {
+    // 页面初始化
+    if (localStorage) {
+      const localStorageData = localStorage.getItem(localStorageKey);
+      if (localStorageData) {
+        const storageObj = JSON.parse(localStorageData);
+        const humanPrompt = storageObj.useHistory.filter((it: any) => it.obj === 'Human');
+        setChatHistory(storageObj.useHistory.map((it: any) => ({ ...it, status: 'finish' })));
+        setTotalOver(humanPrompt.length >= 5);
+
+        totalMsgCount(humanPrompt.length);
+        setTotalNum(humanPrompt.length);
+      } else {
+        setTotalOver(true);
+      }
+    }
+  }, [localStorage, localStorageKey]);
 
   return (
     <Flex flexDirection={'column'} h={'100%'}>
@@ -927,6 +997,8 @@ const ChatBox = (
           outLinkUid={outLinkUid}
           teamId={teamId}
           teamToken={teamToken}
+          isDisabled={!canUse || totalOver}
+          msgTotal={totalNum}
         />
       )}
       {/* user feedback modal */}

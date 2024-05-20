@@ -40,7 +40,9 @@ const MessageInput = ({
   shareId,
   outLinkUid,
   teamId,
-  teamToken
+  teamToken,
+  isDisabled,
+  msgTotal
 }: OutLinkChatAuthProps & {
   onChange?: (e: string) => void;
   onSendMessage: (e: string) => void;
@@ -49,6 +51,8 @@ const MessageInput = ({
   showFileSelector?: boolean;
   TextareaDom: React.MutableRefObject<HTMLTextAreaElement | null>;
   resetInputVal: (val: string) => void;
+  isDisabled?: boolean;
+  msgTotal: number;
 }) => {
   const [, startSts] = useTransition();
 
@@ -322,13 +326,22 @@ ${images.map((img) => JSON.stringify({ src: img.src })).join('\n')}
             _focusVisible={{
               border: 'none'
             }}
-            placeholder={isSpeaking ? t('core.chat.Speaking') : t('core.chat.Type a message')}
+            placeholder={
+              isDisabled
+                ? msgTotal >= 5
+                  ? '您的提问机会已用完！'
+                  : '您还未登录，请登录后使用！'
+                : isSpeaking
+                  ? t('core.chat.Speaking')
+                  : t('core.chat.Type a message')
+            }
             resize={'none'}
             rows={1}
             height={'22px'}
             lineHeight={'22px'}
             maxHeight={'50vh'}
             maxLength={-1}
+            disabled={isDisabled}
             overflowY={'auto'}
             whiteSpace={'pre-wrap'}
             wordBreak={'break-all'}

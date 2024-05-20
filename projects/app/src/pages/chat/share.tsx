@@ -60,6 +60,9 @@ const OutLink = ({
   const forbidRefresh = useRef(false);
   const initSign = useRef(false);
   const [isEmbed, setIdEmbed] = useState(true);
+  const [canUseChat, setCanUseChat] = useState(false);
+  const [useTotal, setUseTotal] = useState(0);
+  const [localStorageKey, setLocalStorageKey] = useState('');
 
   const { localUId } = useShareChatStore();
   const {
@@ -256,6 +259,53 @@ const OutLink = ({
   // window init
   useEffect(() => {
     setIdEmbed(window !== top);
+    // 接收消息
+    if (window) {
+      window.addEventListener('message', (e) => {
+        if (
+          ['http://localhost:3000', 'http://localhost:3001', 'https://www.oe1.com'].includes(
+            e.origin
+          )
+        ) {
+          console.log(`message from ${e.origin} >>>>>`, e.data);
+          if (localStorage && e.data) {
+            const key = e.data.split(':');
+            const keyName = `chat-${key[0]}`;
+            setLocalStorageKey(keyName);
+            const localStorageData = localStorage.getItem(keyName);
+            if (key[1] === 'logout') {
+              setCanUseChat(false);
+              return;
+            }
+            // 首先获取本地的缓存，查看是否存在缓存及次数
+            if (localStorageData) {
+              const storageObj = JSON.parse(localStorageData);
+              const humanPrompt = storageObj.useHistory.filter((it: any) => it.obj === 'Human');
+              setUseTotal(humanPrompt.length);
+              if (humanPrompt.length >= 5) {
+                setCanUseChat(false);
+              } else {
+                setCanUseChat(true);
+              }
+            } else {
+              const infoObj = {
+                phone: key[1] || '',
+                useHistory: []
+              };
+              const numReg = /\d+/g;
+              if (key[1] === 'logout') {
+                setCanUseChat(false);
+              } else if (key[1] && numReg.test(key[1])) {
+                setCanUseChat(true);
+              }
+              localStorage.setItem(`chat-${key[0]}`, JSON.stringify(infoObj));
+            }
+          } else {
+            setCanUseChat(false);
+          }
+        }
+      });
+    }
   }, []);
 
   return (
@@ -365,9 +415,11 @@ const OutLink = ({
             appAvatar={chatData.app.avatar}
             appName={chatData.app.name}
             history={chatData.history}
-            showHistory={showHistory === '1'}
+            showHistory={false}
             onOpenSlider={onOpenSlider}
           />
+          {/* chat fix bar */}
+          <p className="tip-text-row">您只有5次提问机会，现在还剩{5 - useTotal}次</p>
           {/* chat box */}
           <Box flex={1}>
             <ChatBox
@@ -387,6 +439,11 @@ const OutLink = ({
               chatId={chatId}
               shareId={shareId}
               outLinkUid={outLinkUid}
+              canUse={canUseChat}
+              localStorageKey={localStorageKey}
+              totalMsgCount={(e) => {
+                setUseTotal(e);
+              }}
             />
           </Box>
         </Flex>
