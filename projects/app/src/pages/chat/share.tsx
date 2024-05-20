@@ -263,9 +263,12 @@ const OutLink = ({
     if (window) {
       window.addEventListener('message', (e) => {
         if (
-          ['http://localhost:3000', 'http://localhost:3001', 'https://www.oe1.com'].includes(
-            e.origin
-          )
+          [
+            'http://localhost:3000',
+            'http://localhost:3001',
+            'https://www.oe1.com',
+            'http://10.19.4.227:8001'
+          ].includes(e.origin)
         ) {
           console.log(`message from ${e.origin} >>>>>`, e.data);
           if (localStorage && e.data) {
