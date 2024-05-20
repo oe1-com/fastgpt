@@ -127,6 +127,9 @@ const ChatTest = (
             showFileSelector={checkChatSupportSelectFileByModules(modules)}
             onStartChat={startChat}
             onDelMessage={() => {}}
+            canUse={false}
+            localStorageKey={'test'}
+            totalMsgCount={(e) => {}}
           />
         </Box>
       </Flex>
