@@ -20,8 +20,10 @@ export const readConfigData = (name: string) => {
     // production path
     return `/app/data/${name}`;
   })();
+  console.log('filename===>', filename);
 
   const content = readFileSync(filename, 'utf-8');
+  console.log('content===>', content);
 
   return content;
 };

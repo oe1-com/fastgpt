@@ -77,6 +77,24 @@
       "customExtractPrompt": "",
       "defaultSystemChatPrompt": "",
       "defaultConfig": {}
+    },
+    {
+      "model": "gpt-4o",
+      "name": "gpt-4o",
+      "maxContext": 128000,
+      "maxResponse": 4000,
+      "quoteMaxToken": 100000,
+      "maxTemperature": 1.2,
+      "charsPointsPrice": 0,
+      "censor": false,
+      "vision": true,
+      "datasetProcess": false,
+      "toolChoice": true,
+      "functionCall": false,
+      "customCQPrompt": "",
+      "customExtractPrompt": "",
+      "defaultSystemChatPrompt": "",
+      "defaultConfig": {}
     }
   ],
   "vectorModels": [
